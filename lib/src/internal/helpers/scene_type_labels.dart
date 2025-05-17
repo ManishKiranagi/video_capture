@@ -1,0 +1,10 @@
+const String frontOfPropertyDisplayName = 'Front of Property';
+const String entranceHallDisplayName = 'Entrance Hall / Space';
+const String receptionRoomDisplayName = 'Reception Room / Spaces';
+const String kitchenDisplayName = 'Kitchen / Diner';
+const String diningRoomDisplayName = 'Dining Room';
+const String conservatoryDisplayName = 'Conservatory';
+const String bedroomDisplayName = 'Bedroom(s)';
+const String bathroomDisplayName = 'Bathroom(s)';
+const String gardenDisplayName = 'Garden / Outdoor Space';
+const String terraceDisplayName = 'Terrace / Balcony';

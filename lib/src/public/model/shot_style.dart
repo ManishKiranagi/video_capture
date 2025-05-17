@@ -1,0 +1,4 @@
+enum ShotStyle {
+  walkthrough,
+  cinematic,
+}

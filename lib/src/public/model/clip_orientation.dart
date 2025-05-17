@@ -1,0 +1,4 @@
+enum ClipOrientation {
+  portrait,
+  landscape,
+}
