@@ -9,6 +9,7 @@ class VideoCaptureConfig {
   final Function(VideoClipResult result)? onClipComplete;
   final Function()? onFlowComplete;
   final Function(List<SceneCaptureRequest> sceneTypes)? onSceneTypesSelected;
+  final Function() onFlowCancelled;
 
   const VideoCaptureConfig(
       {this.theme,
@@ -16,5 +17,6 @@ class VideoCaptureConfig {
       this.onFlowComplete,
       this.clipRequests,
       this.onSceneTypesSelected,
-      this.completedClips});
+      this.completedClips,
+      required this.onFlowCancelled});
 }
