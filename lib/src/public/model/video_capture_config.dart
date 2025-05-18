@@ -3,7 +3,7 @@ import 'package:video_capture/src/public/model/scene_capture_request.dart';
 import 'package:video_capture/src/public/model/video_clip_result.dart';
 
 class VideoCaptureConfig {
-  final List<SceneCaptureRequest>? clipRequests;
+  final List<SceneCaptureRequest>? sceneCaptureRequests;
   final List<VideoClipResult>? completedClips;
   final ThemeData? theme;
   final Function(VideoClipResult result)? onClipComplete;
@@ -15,7 +15,7 @@ class VideoCaptureConfig {
       {this.theme,
       this.onClipComplete,
       this.onFlowComplete,
-      this.clipRequests,
+      this.sceneCaptureRequests,
       this.onSceneTypesSelected,
       this.completedClips,
       required this.onFlowCancelled});
