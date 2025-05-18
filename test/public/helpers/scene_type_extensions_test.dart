@@ -22,14 +22,6 @@ void main() {
       expect(SceneType.kitchen.displayName, kitchenDisplayName);
     });
 
-    test('returns correct name for diningRoom', () {
-      expect(SceneType.diningRoom.displayName, diningRoomDisplayName);
-    });
-
-    test('returns correct name for conservatory', () {
-      expect(SceneType.conservatory.displayName, conservatoryDisplayName);
-    });
-
     test('returns correct name for bedroom', () {
       expect(SceneType.bedroom.displayName, bedroomDisplayName);
     });
@@ -40,10 +32,6 @@ void main() {
 
     test('returns correct name for garden', () {
       expect(SceneType.garden.displayName, gardenDisplayName);
-    });
-
-    test('returns correct name for terrace', () {
-      expect(SceneType.terrace.displayName, terraceDisplayName);
     });
   });
 }

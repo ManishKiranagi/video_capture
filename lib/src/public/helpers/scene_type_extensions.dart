@@ -12,18 +12,12 @@ extension SceneTypeDisplay on SceneType {
         return receptionRoomDisplayName;
       case SceneType.kitchen:
         return kitchenDisplayName;
-      case SceneType.diningRoom:
-        return diningRoomDisplayName;
-      case SceneType.conservatory:
-        return conservatoryDisplayName;
       case SceneType.bedroom:
         return bedroomDisplayName;
       case SceneType.bathroom:
         return bathroomDisplayName;
       case SceneType.garden:
         return gardenDisplayName;
-      case SceneType.terrace:
-        return terraceDisplayName;
     }
   }
 }

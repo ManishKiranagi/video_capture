@@ -19,17 +19,12 @@ extension SceneTypeShotStyles on SceneType {
         return [];
       case SceneType.kitchen:
         return [];
-      case SceneType.diningRoom:
-        return [];
-      case SceneType.conservatory:
-        return [];
+
       case SceneType.bedroom:
         return [];
       case SceneType.bathroom:
         return [];
       case SceneType.garden:
-        return [];
-      case SceneType.terrace:
         return [];
     }
   }
