@@ -1,5 +1,5 @@
 // File: lib/src/internal/extensions/scene_type_extensions.dart
-import 'package:video_capture/src/internal/model/shot_style_config.dart';
+import 'package:video_capture/src/internal/video_capture/model/shot_style_config.dart';
 import 'package:video_capture/src/public/model/scene_type.dart';
 import 'package:video_capture/src/public/model/shot_style.dart';
 

@@ -1,4 +1,4 @@
-import 'package:video_capture/src/internal/helpers/scene_type_labels.dart';
+import 'package:video_capture/src/helpers/scene_type_labels.dart';
 import 'package:video_capture/src/public/model/scene_type.dart';
 
 extension SceneTypeDisplay on SceneType {

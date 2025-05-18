@@ -1,6 +1,6 @@
 // test/helpers/scene_type_extensions_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:video_capture/src/internal/helpers/scene_type_labels.dart';
+import 'package:video_capture/src/helpers/scene_type_labels.dart';
 import 'package:video_capture/src/public/helpers/scene_type_extensions.dart';
 import 'package:video_capture/src/public/model/scene_type.dart';
 

@@ -1,4 +1,4 @@
-import 'package:video_capture/src/internal/helpers/shot_style_labels.dart';
+import 'package:video_capture/src/helpers/shot_style_labels.dart';
 import 'package:video_capture/src/public/model/shot_style.dart';
 
 extension ShotStyleDisplay on ShotStyle {

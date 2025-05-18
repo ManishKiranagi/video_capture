@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_capture/src/public/helpers/shot_style_extensions.dart';
 import 'package:video_capture/src/public/model/shot_style.dart';
-import 'package:video_capture/src/internal/helpers/shot_style_labels.dart';
+import 'package:video_capture/src/helpers/shot_style_labels.dart';
 
 void main() {
   group('ShotStyleDisplay extension', () {
