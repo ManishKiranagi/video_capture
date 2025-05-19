@@ -45,6 +45,7 @@ class _VideoCaptureMainWidgetState extends State<VideoCaptureMainWidget> {
 
     return SceneTypeSelectionScreen(
       onSceneTypesConfirmed: _handleSceneTypesSelected,
+      videoCaptureConfig: config,
     );
   }
 }
