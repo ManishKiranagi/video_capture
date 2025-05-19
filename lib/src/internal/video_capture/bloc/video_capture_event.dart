@@ -1,22 +1,43 @@
 part of 'video_capture_bloc.dart';
 
-abstract class VideoCaptureFlowEvent {}
+abstract class VideoCaptureFlowEvent extends Equatable {}
 
-class InitializeCaptureFlow extends VideoCaptureFlowEvent {
-  final List<ClipSpec> clipSpecs;
-  InitializeCaptureFlow(this.clipSpecs);
-}
-
-class OrientationChanged extends VideoCaptureFlowEvent {
+class VideoCaptureFlowOrientationChanged extends VideoCaptureFlowEvent {
   final DeviceOrientation orientation;
-  OrientationChanged(this.orientation);
+
+  VideoCaptureFlowOrientationChanged({required this.orientation});
+
+  @override
+  List<Object> get props => [orientation];
 }
 
-class StartRecording extends VideoCaptureFlowEvent {}
+class VideoCaptureFlowFilmingProcessStarted extends VideoCaptureFlowEvent {
+  VideoCaptureFlowFilmingProcessStarted();
 
-class StopRecording extends VideoCaptureFlowEvent {
-  final String filePath;
-  StopRecording(this.filePath);
+  @override
+  List<Object> get props => [];
 }
 
-class ApproveRecording extends VideoCaptureFlowEvent {}
+class VideoCaptureFlowShotStyleSelected extends VideoCaptureFlowEvent {
+  final ShotStyle shotStyle;
+
+  VideoCaptureFlowShotStyleSelected({required this.shotStyle});
+
+  @override
+  List<Object> get props => [shotStyle];
+}
+
+class VideoCaptureFlowFilmingStarted extends VideoCaptureFlowEvent {
+  VideoCaptureFlowFilmingStarted();
+
+  @override
+  List<Object> get props => [];
+}
+
+class VideoCaptureFlowShotApproved extends VideoCaptureFlowEvent {
+  final String videoFilePath;
+  VideoCaptureFlowShotApproved({required this.videoFilePath});
+
+  @override
+  List<Object> get props => [videoFilePath];
+}

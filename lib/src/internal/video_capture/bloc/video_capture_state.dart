@@ -1,66 +1,72 @@
 part of 'video_capture_bloc.dart';
 
-enum VideoCaptureStage {
-  messaging,
-  guidance,
-  shotTypeSelection,
-  recording,
-  approval,
-  completed,
-}
+class VideoCaptureFlowState extends Equatable {
+  final List<SceneCaptureRequest> requiredScenes;
+  final List<VideoClipResult> completedClips;
 
-class ClipSpec {
-  final String sceneType;
-  final DeviceOrientation requiredOrientation;
-
-  ClipSpec({required this.sceneType, required this.requiredOrientation});
-}
-
-class RecordedClip {
-  final ClipSpec spec;
-  final String filePath;
-
-  RecordedClip({required this.spec, required this.filePath});
-}
-
-class VideoCaptureFlowState {
-  final List<ClipSpec> remainingClips;
-  final ClipSpec? currentClip;
   final VideoCaptureStage stage;
-  final DeviceOrientation deviceOrientation;
+
+  final SceneType currentScene;
+  final Orientation requiredOrientation;
+  final ShotStyle? selectedShotStyle;
+
   final bool isOrientationCorrect;
-  final bool isRecording;
-  final List<RecordedClip> recordedClips;
 
-  bool get isCompleted => remainingClips.isEmpty;
-
-  const VideoCaptureFlowState({
-    required this.remainingClips,
-    required this.currentClip,
-    required this.stage,
-    required this.deviceOrientation,
-    required this.isOrientationCorrect,
-    required this.isRecording,
-    required this.recordedClips,
-  });
+  const VideoCaptureFlowState(
+      {required this.requiredScenes,
+      required this.completedClips,
+      required this.stage,
+      required this.currentScene,
+      required this.requiredOrientation,
+      this.selectedShotStyle,
+      required this.isOrientationCorrect});
 
   VideoCaptureFlowState copyWith({
-    List<ClipSpec>? remainingClips,
-    ClipSpec? currentClip,
+    List<VideoClipResult>? completedClips,
     VideoCaptureStage? stage,
-    DeviceOrientation? deviceOrientation,
+    SceneType? currentScene,
+    Orientation? requiredOrientation,
+    ShotStyle? selectedShotStyle,
     bool? isOrientationCorrect,
-    bool? isRecording,
-    List<RecordedClip>? recordedClips,
   }) {
     return VideoCaptureFlowState(
-      remainingClips: remainingClips ?? this.remainingClips,
-      currentClip: currentClip ?? this.currentClip,
+      requiredScenes: requiredScenes,
+      completedClips: completedClips ?? this.completedClips,
       stage: stage ?? this.stage,
-      deviceOrientation: deviceOrientation ?? this.deviceOrientation,
+      currentScene: currentScene ?? this.currentScene,
+      requiredOrientation: requiredOrientation ?? this.requiredOrientation,
+      selectedShotStyle: selectedShotStyle ?? this.selectedShotStyle,
       isOrientationCorrect: isOrientationCorrect ?? this.isOrientationCorrect,
-      isRecording: isRecording ?? this.isRecording,
-      recordedClips: recordedClips ?? this.recordedClips,
     );
   }
+
+  factory VideoCaptureFlowState.initial({
+    required List<SceneCaptureRequest> requiredScenes,
+    required Orientation currentOrientation,
+    List<VideoClipResult>? completedClips,
+  }) {
+    if (requiredScenes.isEmpty) {
+      throw ArgumentError('requiredScenes cannot be empty');
+    }
+
+    return VideoCaptureFlowState(
+      requiredScenes: requiredScenes,
+      completedClips: completedClips ?? [],
+      stage: VideoCaptureStage.orientationMessaging,
+      currentScene: requiredScenes[0].sceneType,
+      requiredOrientation: Orientation.landscape,
+      isOrientationCorrect: currentOrientation == Orientation.landscape,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        requiredScenes,
+        completedClips,
+        stage,
+        currentScene,
+        requiredOrientation,
+        selectedShotStyle,
+        isOrientationCorrect
+      ];
 }
