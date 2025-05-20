@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/services.dart';
 import 'package:video_capture/src/internal/video_capture/model/video_capture_stage.dart';
+import 'package:video_capture/src/public/model/clip_orientation.dart';
 import 'package:video_capture/src/public/model/scene_capture_request.dart';
 import 'package:video_capture/src/public/model/scene_type.dart';
 import 'package:video_capture/src/public/model/shot_style.dart';
@@ -26,19 +26,63 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
     on<VideoCaptureFlowFilmingProcessStarted>(_onVideoCaptureFlowFilmingProcessStarted);
     on<VideoCaptureFlowShotStyleSelected>(_onVideoCaptureFlowShotStyleSelected);
     on<VideoCaptureFlowFilmingStarted>(_onVideoCaptureFlowFilmingStarted);
+    on<VideoCaptureFlowFilmingFinished>(_onVideoCaptureFlowFilmingFinished);
     on<VideoCaptureFlowShotApproved>(_onVideoCaptureFlowShotApproved);
   }
 
   void _onVideoCaptureFlowOrientationChanged(
-      VideoCaptureFlowOrientationChanged event, Emitter<VideoCaptureFlowState> emit) {}
+      VideoCaptureFlowOrientationChanged event, Emitter<VideoCaptureFlowState> emit) {
+    final isOrientationCorrect = state.requiredOrientation == event.orientation;
+    var nextStage = state.stage;
+
+    if (state.stage == VideoCaptureStage.orientationMessaging && isOrientationCorrect) {
+      nextStage = VideoCaptureStage.videoCaptureGuidance;
+    }
+    if (state.stage == VideoCaptureStage.recording && isOrientationCorrect) {
+      nextStage = VideoCaptureStage.shotTypeSelection;
+    }
+
+    emit(state.copyWith(
+      isOrientationCorrect: isOrientationCorrect,
+      stage: nextStage,
+    ));
+  }
 
   void _onVideoCaptureFlowFilmingProcessStarted(
-      VideoCaptureFlowFilmingProcessStarted event, Emitter<VideoCaptureFlowState> emit) {}
+      VideoCaptureFlowFilmingProcessStarted event, Emitter<VideoCaptureFlowState> emit) {
+    emit(state.copyWith(stage: VideoCaptureStage.shotTypeSelection));
+  }
 
   void _onVideoCaptureFlowShotStyleSelected(
-      VideoCaptureFlowShotStyleSelected event, Emitter<VideoCaptureFlowState> emit) {}
+      VideoCaptureFlowShotStyleSelected event, Emitter<VideoCaptureFlowState> emit) {
+    emit(state.copyWith(selectedShotStyle: event.shotStyle));
+  }
 
-  void _onVideoCaptureFlowFilmingStarted(VideoCaptureFlowFilmingStarted event, Emitter<VideoCaptureFlowState> emit) {}
+  void _onVideoCaptureFlowFilmingStarted(VideoCaptureFlowFilmingStarted event, Emitter<VideoCaptureFlowState> emit) {
+    emit(state.copyWith(stage: VideoCaptureStage.recording));
+  }
 
-  void _onVideoCaptureFlowShotApproved(VideoCaptureFlowShotApproved event, Emitter<VideoCaptureFlowState> emit) {}
+  void _onVideoCaptureFlowFilmingFinished(VideoCaptureFlowFilmingFinished event, Emitter<VideoCaptureFlowState> emit) {
+    final clipResult = VideoClipResult(
+        sceneType: state.currentScene,
+        filePath: event.videoFilePath,
+        orientation:
+            state.requiredOrientation == Orientation.landscape ? ClipOrientation.landscape : ClipOrientation.portrait,
+        shotStyle: state.selectedShotStyle!);
+
+    emit(state.copyWith(stage: VideoCaptureStage.approval, videoClip: clipResult));
+  }
+
+  void _onVideoCaptureFlowShotApproved(VideoCaptureFlowShotApproved event, Emitter<VideoCaptureFlowState> emit) {
+    //copy clip result to completed clips
+
+    //check next clip
+    //if all clips completed
+    //next stage is completion
+    //if not all complete
+    //reset state
+    //move to orientation message
+
+    //how does UI call onClipComplete and onFlowComplete
+  }
 }

@@ -5,10 +5,13 @@ class VideoCaptureFlowState extends Equatable {
   final List<VideoClipResult> completedClips;
 
   final VideoCaptureStage stage;
+  final VideoCaptureStage? previousStage;
 
   final SceneType currentScene;
   final Orientation requiredOrientation;
   final ShotStyle? selectedShotStyle;
+
+  final VideoClipResult? videoClip;
 
   final bool isOrientationCorrect;
 
@@ -19,25 +22,29 @@ class VideoCaptureFlowState extends Equatable {
       required this.currentScene,
       required this.requiredOrientation,
       this.selectedShotStyle,
-      required this.isOrientationCorrect});
+      required this.isOrientationCorrect,
+      this.videoClip,
+      this.previousStage});
 
-  VideoCaptureFlowState copyWith({
-    List<VideoClipResult>? completedClips,
-    VideoCaptureStage? stage,
-    SceneType? currentScene,
-    Orientation? requiredOrientation,
-    ShotStyle? selectedShotStyle,
-    bool? isOrientationCorrect,
-  }) {
+  VideoCaptureFlowState copyWith(
+      {List<VideoClipResult>? completedClips,
+      VideoCaptureStage? stage,
+      SceneType? currentScene,
+      Orientation? requiredOrientation,
+      ShotStyle? selectedShotStyle,
+      bool? isOrientationCorrect,
+      VideoClipResult? videoClip,
+      VideoCaptureStage? previousStage}) {
     return VideoCaptureFlowState(
-      requiredScenes: requiredScenes,
-      completedClips: completedClips ?? this.completedClips,
-      stage: stage ?? this.stage,
-      currentScene: currentScene ?? this.currentScene,
-      requiredOrientation: requiredOrientation ?? this.requiredOrientation,
-      selectedShotStyle: selectedShotStyle ?? this.selectedShotStyle,
-      isOrientationCorrect: isOrientationCorrect ?? this.isOrientationCorrect,
-    );
+        requiredScenes: requiredScenes,
+        completedClips: completedClips ?? this.completedClips,
+        stage: stage ?? this.stage,
+        currentScene: currentScene ?? this.currentScene,
+        requiredOrientation: requiredOrientation ?? this.requiredOrientation,
+        selectedShotStyle: selectedShotStyle ?? this.selectedShotStyle,
+        isOrientationCorrect: isOrientationCorrect ?? this.isOrientationCorrect,
+        videoClip: videoClip ?? this.videoClip,
+        previousStage: previousStage ?? this.previousStage);
   }
 
   factory VideoCaptureFlowState.initial({

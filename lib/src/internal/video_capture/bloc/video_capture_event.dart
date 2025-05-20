@@ -3,7 +3,7 @@ part of 'video_capture_bloc.dart';
 abstract class VideoCaptureFlowEvent extends Equatable {}
 
 class VideoCaptureFlowOrientationChanged extends VideoCaptureFlowEvent {
-  final DeviceOrientation orientation;
+  final Orientation orientation;
 
   VideoCaptureFlowOrientationChanged({required this.orientation});
 
@@ -32,6 +32,14 @@ class VideoCaptureFlowFilmingStarted extends VideoCaptureFlowEvent {
 
   @override
   List<Object> get props => [];
+}
+
+class VideoCaptureFlowFilmingFinished extends VideoCaptureFlowEvent {
+  final String videoFilePath;
+  VideoCaptureFlowFilmingFinished(this.videoFilePath);
+
+  @override
+  List<Object> get props => [videoFilePath];
 }
 
 class VideoCaptureFlowShotApproved extends VideoCaptureFlowEvent {

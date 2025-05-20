@@ -1,1 +1,8 @@
-enum VideoCaptureStage { orientationMessaging, videoCaptureGuidance, shotTypeSelection, recording, approval }
+enum VideoCaptureStage {
+  orientationMessaging,
+  videoCaptureGuidance,
+  shotTypeSelection,
+  recording,
+  approval,
+  completion
+}
