@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:video_capture/src/helpers/wrapper.dart';
 import 'package:video_capture/src/internal/video_capture/bloc/video_capture_bloc.dart';
 import 'package:video_capture/src/internal/video_capture/model/video_capture_stage.dart';
 import 'package:video_capture/src/public/model/clip_orientation.dart';
@@ -58,7 +59,7 @@ void main() {
         requiredOrientation: Orientation.landscape,
         selectedShotStyle: ShotStyle.walkthrough,
         isOrientationCorrect: true,
-        videoClip: sampleClip,
+        videoClip: const Wrapped.value(sampleClip),
         previousStage: VideoCaptureStage.orientationMessaging,
       );
 

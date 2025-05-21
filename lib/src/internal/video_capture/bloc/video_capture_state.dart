@@ -33,7 +33,7 @@ class VideoCaptureFlowState extends Equatable {
       Orientation? requiredOrientation,
       ShotStyle? selectedShotStyle,
       bool? isOrientationCorrect,
-      VideoClipResult? videoClip,
+      Wrapped<VideoClipResult?>? videoClip,
       VideoCaptureStage? previousStage}) {
     return VideoCaptureFlowState(
         requiredScenes: requiredScenes,
@@ -43,7 +43,7 @@ class VideoCaptureFlowState extends Equatable {
         requiredOrientation: requiredOrientation ?? this.requiredOrientation,
         selectedShotStyle: selectedShotStyle ?? this.selectedShotStyle,
         isOrientationCorrect: isOrientationCorrect ?? this.isOrientationCorrect,
-        videoClip: videoClip ?? this.videoClip,
+        videoClip: videoClip != null ? videoClip.value : this.videoClip,
         previousStage: previousStage ?? this.previousStage);
   }
 

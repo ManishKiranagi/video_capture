@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:video_capture/src/helpers/wrapper.dart';
 import 'package:video_capture/src/internal/video_capture/model/video_capture_stage.dart';
 import 'package:video_capture/src/public/model/clip_orientation.dart';
 import 'package:video_capture/src/public/model/scene_capture_request.dart';
@@ -70,7 +71,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
             state.requiredOrientation == Orientation.landscape ? ClipOrientation.landscape : ClipOrientation.portrait,
         shotStyle: state.selectedShotStyle!);
 
-    emit(state.copyWith(stage: VideoCaptureStage.approval, videoClip: clipResult));
+    emit(state.copyWith(stage: VideoCaptureStage.approval, videoClip: Wrapped.value(clipResult)));
   }
 
   void _onVideoCaptureFlowShotApproved(VideoCaptureFlowShotApproved event, Emitter<VideoCaptureFlowState> emit) {
