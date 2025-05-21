@@ -34,24 +34,24 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
   void _onVideoCaptureFlowOrientationChanged(
       VideoCaptureFlowOrientationChanged event, Emitter<VideoCaptureFlowState> emit) {
     final isOrientationCorrect = state.requiredOrientation == event.orientation;
-    var nextStage = state.stage;
+    var currentStage = state.stage;
+    var previousStage = state.previousStage;
 
     if (state.stage == VideoCaptureStage.orientationMessaging && isOrientationCorrect) {
-      nextStage = VideoCaptureStage.videoCaptureGuidance;
+      previousStage = VideoCaptureStage.orientationMessaging;
+      currentStage = VideoCaptureStage.videoCaptureGuidance;
     }
     if (state.stage == VideoCaptureStage.recording && isOrientationCorrect) {
-      nextStage = VideoCaptureStage.shotTypeSelection;
+      previousStage = VideoCaptureStage.recording;
+      currentStage = VideoCaptureStage.shotTypeSelection;
     }
 
-    emit(state.copyWith(
-      isOrientationCorrect: isOrientationCorrect,
-      stage: nextStage,
-    ));
+    emit(state.copyWith(isOrientationCorrect: isOrientationCorrect, stage: currentStage, previousStage: previousStage));
   }
 
   void _onVideoCaptureFlowFilmingProcessStarted(
       VideoCaptureFlowFilmingProcessStarted event, Emitter<VideoCaptureFlowState> emit) {
-    emit(state.copyWith(stage: VideoCaptureStage.shotTypeSelection));
+    emit(_updateVideoCaptureStage(state, VideoCaptureStage.shotTypeSelection));
   }
 
   void _onVideoCaptureFlowShotStyleSelected(
@@ -60,7 +60,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
   }
 
   void _onVideoCaptureFlowFilmingStarted(VideoCaptureFlowFilmingStarted event, Emitter<VideoCaptureFlowState> emit) {
-    emit(state.copyWith(stage: VideoCaptureStage.recording));
+    emit(_updateVideoCaptureStage(state, VideoCaptureStage.recording));
   }
 
   void _onVideoCaptureFlowFilmingFinished(VideoCaptureFlowFilmingFinished event, Emitter<VideoCaptureFlowState> emit) {
@@ -71,7 +71,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
             state.requiredOrientation == Orientation.landscape ? ClipOrientation.landscape : ClipOrientation.portrait,
         shotStyle: state.selectedShotStyle!);
 
-    emit(state.copyWith(stage: VideoCaptureStage.approval, videoClip: Wrapped.value(clipResult)));
+    emit(_updateVideoCaptureStage(state, VideoCaptureStage.approval).copyWith(videoClip: Wrapped.value(clipResult)));
   }
 
   void _onVideoCaptureFlowShotApproved(VideoCaptureFlowShotApproved event, Emitter<VideoCaptureFlowState> emit) {
@@ -85,5 +85,9 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
     //move to orientation message
 
     //how does UI call onClipComplete and onFlowComplete
+  }
+
+  VideoCaptureFlowState _updateVideoCaptureStage(VideoCaptureFlowState state, VideoCaptureStage currentStage) {
+    return state.copyWith(previousStage: state.stage, stage: currentStage);
   }
 }
