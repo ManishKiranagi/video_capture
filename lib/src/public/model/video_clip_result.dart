@@ -7,7 +7,12 @@ class VideoClipResult {
   final String filePath;
   final ClipOrientation orientation;
   final ShotStyle shotStyle;
+  final String sceneId;
 
   const VideoClipResult(
-      {required this.sceneType, required this.filePath, required this.orientation, required this.shotStyle});
+      {required this.sceneType,
+      required this.filePath,
+      required this.orientation,
+      required this.shotStyle,
+      required this.sceneId});
 }

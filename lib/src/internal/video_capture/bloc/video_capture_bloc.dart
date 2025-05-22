@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:video_capture/src/helpers/iterable_extension.dart';
 import 'package:video_capture/src/helpers/wrapper.dart';
 import 'package:video_capture/src/internal/video_capture/model/video_capture_stage.dart';
 import 'package:video_capture/src/public/model/clip_orientation.dart';
 import 'package:video_capture/src/public/model/scene_capture_request.dart';
-import 'package:video_capture/src/public/model/scene_type.dart';
 import 'package:video_capture/src/public/model/shot_style.dart';
 import 'package:video_capture/src/public/model/video_clip_result.dart';
 
@@ -56,7 +56,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
 
   void _onVideoCaptureFlowShotStyleSelected(
       VideoCaptureFlowShotStyleSelected event, Emitter<VideoCaptureFlowState> emit) {
-    emit(state.copyWith(selectedShotStyle: event.shotStyle));
+    emit(state.copyWith(selectedShotStyle: Wrapped.value(event.shotStyle)));
   }
 
   void _onVideoCaptureFlowFilmingStarted(VideoCaptureFlowFilmingStarted event, Emitter<VideoCaptureFlowState> emit) {
@@ -64,8 +64,10 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
   }
 
   void _onVideoCaptureFlowFilmingFinished(VideoCaptureFlowFilmingFinished event, Emitter<VideoCaptureFlowState> emit) {
+    final currentScene = state.currentScene!;
     final clipResult = VideoClipResult(
-        sceneType: state.currentScene,
+        sceneId: currentScene.sceneId,
+        sceneType: currentScene.sceneType,
         filePath: event.videoFilePath,
         orientation:
             state.requiredOrientation == Orientation.landscape ? ClipOrientation.landscape : ClipOrientation.portrait,
@@ -75,19 +77,53 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
   }
 
   void _onVideoCaptureFlowShotApproved(VideoCaptureFlowShotApproved event, Emitter<VideoCaptureFlowState> emit) {
-    //copy clip result to completed clips
+    final updatedClips = [...state.completedClips, state.videoClip!];
 
-    //check next clip
-    //if all clips completed
-    //next stage is completion
-    //if not all complete
-    //reset state
-    //move to orientation message
+    final updatedState = state.copyWith(completedClips: updatedClips, videoClip: const Wrapped.value(null));
 
-    //how does UI call onClipComplete and onFlowComplete
+    final nextScene = _findNextIncompleteScene(updatedClips);
+
+    if (nextScene == null) {
+      emit(_transitionToCompletion(updatedState));
+    } else {
+      emit(_transitionToNextScene(updatedState, nextScene));
+    }
+  }
+
+  // --- Private helper methods below ---
+
+  VideoCaptureFlowState _transitionToCompletion(VideoCaptureFlowState state) {
+    return _updateVideoCaptureStage(state, VideoCaptureStage.completion).copyWith(
+      currentScene: const Wrapped.value(null),
+      requiredOrientation: const Wrapped.value(null),
+      selectedShotStyle: const Wrapped.value(null),
+    );
+  }
+
+  VideoCaptureFlowState _transitionToNextScene(VideoCaptureFlowState state, SceneCaptureRequest nextScene) {
+    final requiredOrientation = _toggleOrientation(state.requiredOrientation!);
+
+    final selectedShotStyle =
+        state.requiredOrientation == Orientation.landscape ? const Wrapped<ShotStyle?>.value(null) : null;
+
+    return _updateVideoCaptureStage(state, VideoCaptureStage.orientationMessaging).copyWith(
+      currentScene: Wrapped.value(nextScene),
+      requiredOrientation: Wrapped.value(requiredOrientation),
+      selectedShotStyle: selectedShotStyle,
+    );
+  }
+
+  SceneCaptureRequest? _findNextIncompleteScene(List<VideoClipResult> completedClips) {
+    return state.requiredScenes.firstWhereOrNull(
+      (scene) => !VideoCaptureFlowState.isSceneComplete(scene, completedClips),
+    );
   }
 
   VideoCaptureFlowState _updateVideoCaptureStage(VideoCaptureFlowState state, VideoCaptureStage currentStage) {
     return state.copyWith(previousStage: state.stage, stage: currentStage);
+  }
+
+  Orientation _toggleOrientation(Orientation current) {
+    return current == Orientation.landscape ? Orientation.portrait : Orientation.landscape;
   }
 }

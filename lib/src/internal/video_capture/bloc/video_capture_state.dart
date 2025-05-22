@@ -7,8 +7,8 @@ class VideoCaptureFlowState extends Equatable {
   final VideoCaptureStage stage;
   final VideoCaptureStage? previousStage;
 
-  final SceneType currentScene;
-  final Orientation requiredOrientation;
+  final SceneCaptureRequest? currentScene;
+  final Orientation? requiredOrientation;
   final ShotStyle? selectedShotStyle;
 
   final VideoClipResult? videoClip;
@@ -19,8 +19,8 @@ class VideoCaptureFlowState extends Equatable {
       {required this.requiredScenes,
       required this.completedClips,
       required this.stage,
-      required this.currentScene,
-      required this.requiredOrientation,
+      this.currentScene,
+      this.requiredOrientation,
       this.selectedShotStyle,
       required this.isOrientationCorrect,
       this.videoClip,
@@ -29,9 +29,9 @@ class VideoCaptureFlowState extends Equatable {
   VideoCaptureFlowState copyWith(
       {List<VideoClipResult>? completedClips,
       VideoCaptureStage? stage,
-      SceneType? currentScene,
-      Orientation? requiredOrientation,
-      ShotStyle? selectedShotStyle,
+      Wrapped<SceneCaptureRequest?>? currentScene,
+      Wrapped<Orientation?>? requiredOrientation,
+      Wrapped<ShotStyle?>? selectedShotStyle,
       bool? isOrientationCorrect,
       Wrapped<VideoClipResult?>? videoClip,
       VideoCaptureStage? previousStage}) {
@@ -39,9 +39,9 @@ class VideoCaptureFlowState extends Equatable {
         requiredScenes: requiredScenes,
         completedClips: completedClips ?? this.completedClips,
         stage: stage ?? this.stage,
-        currentScene: currentScene ?? this.currentScene,
-        requiredOrientation: requiredOrientation ?? this.requiredOrientation,
-        selectedShotStyle: selectedShotStyle ?? this.selectedShotStyle,
+        currentScene: currentScene != null ? currentScene.value : this.currentScene,
+        requiredOrientation: requiredOrientation != null ? requiredOrientation.value : this.requiredOrientation,
+        selectedShotStyle: selectedShotStyle != null ? selectedShotStyle.value : this.selectedShotStyle,
         isOrientationCorrect: isOrientationCorrect ?? this.isOrientationCorrect,
         videoClip: videoClip != null ? videoClip.value : this.videoClip,
         previousStage: previousStage ?? this.previousStage);
@@ -56,14 +56,54 @@ class VideoCaptureFlowState extends Equatable {
       throw ArgumentError('requiredScenes cannot be empty');
     }
 
+    final completed = completedClips ?? [];
+
+    final nextScene = requiredScenes.firstWhere(
+      (scene) => !isSceneComplete(scene, completed),
+      orElse: () => throw StateError('All required scenes are already completed'),
+    );
+
+    final requiredOrientation = VideoCaptureFlowState.determineNextRequiredOrientation(
+      scene: nextScene,
+      completedClips: completed,
+    );
+
     return VideoCaptureFlowState(
       requiredScenes: requiredScenes,
-      completedClips: completedClips ?? [],
+      completedClips: completed,
       stage: VideoCaptureStage.orientationMessaging,
-      currentScene: requiredScenes[0].sceneType,
-      requiredOrientation: Orientation.landscape,
-      isOrientationCorrect: currentOrientation == Orientation.landscape,
+      currentScene: nextScene,
+      requiredOrientation: requiredOrientation,
+      isOrientationCorrect: currentOrientation == requiredOrientation,
     );
+  }
+
+  static bool isSceneComplete(SceneCaptureRequest scene, List<VideoClipResult> completedClips) {
+    final clipsForScene =
+        completedClips.where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType);
+    final hasPortrait = clipsForScene.any((clip) => clip.orientation == ClipOrientation.portrait);
+    final hasLandscape = clipsForScene.any((clip) => clip.orientation == ClipOrientation.landscape);
+    return hasPortrait && hasLandscape;
+  }
+
+  static Orientation determineNextRequiredOrientation({
+    required SceneCaptureRequest scene,
+    required List<VideoClipResult> completedClips,
+  }) {
+    final orientationsCompleted = completedClips
+        .where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType)
+        .map((clip) => clip.orientation)
+        .toSet();
+
+    if (!orientationsCompleted.contains(ClipOrientation.landscape)) {
+      return Orientation.landscape;
+    }
+
+    if (!orientationsCompleted.contains(ClipOrientation.portrait)) {
+      return Orientation.portrait;
+    }
+
+    throw StateError('All orientations already completed for sceneId: ${scene.sceneId}');
   }
 
   @override
