@@ -13,22 +13,32 @@ part 'video_capture_event.dart';
 part 'video_capture_state.dart';
 
 class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowState> {
-  VideoCaptureFlowBloc(
-      {required List<SceneCaptureRequest> requiredScenes,
-      List<VideoClipResult>? completedClips,
-      required Orientation currentOrientation})
-      : assert(requiredScenes.isNotEmpty, 'requiredScenes must not be empty'),
-        super(VideoCaptureFlowState.initial(
-          requiredScenes: requiredScenes,
-          completedClips: completedClips,
-          currentOrientation: currentOrientation,
-        )) {
+  VideoCaptureFlowBloc() : super(VideoCaptureFlowState.empty()) {
+    on<VideoCaptureFlowStarted>(_onVideoCaptureFlowStarted);
     on<VideoCaptureFlowOrientationChanged>(_onVideoCaptureFlowOrientationChanged);
     on<VideoCaptureFlowFilmingProcessStarted>(_onVideoCaptureFlowFilmingProcessStarted);
     on<VideoCaptureFlowShotStyleSelected>(_onVideoCaptureFlowShotStyleSelected);
     on<VideoCaptureFlowFilmingStarted>(_onVideoCaptureFlowFilmingStarted);
     on<VideoCaptureFlowFilmingFinished>(_onVideoCaptureFlowFilmingFinished);
     on<VideoCaptureFlowShotApproved>(_onVideoCaptureFlowShotApproved);
+  }
+
+  void _onVideoCaptureFlowStarted(VideoCaptureFlowStarted event, Emitter<VideoCaptureFlowState> emit) {
+    try {
+      final initialState = _initialiseState(
+        requiredScenes: event.requiredScenes,
+        completedClips: event.completedClips,
+        currentOrientation: event.currentOrientation,
+      );
+      emit(initialState);
+    } catch (e) {
+      final errorMessage = switch (e) {
+        ArgumentError() => e.message,
+        StateError() => e.message,
+        _ => e.toString(),
+      };
+      emit(VideoCaptureFlowState.failure(errorMessage));
+    }
   }
 
   void _onVideoCaptureFlowOrientationChanged(
@@ -91,6 +101,64 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
   }
 
   // --- Private helper methods below ---
+  VideoCaptureFlowState _initialiseState({
+    required List<SceneCaptureRequest> requiredScenes,
+    required Orientation currentOrientation,
+    List<VideoClipResult>? completedClips,
+  }) {
+    if (requiredScenes.isEmpty) {
+      throw ArgumentError('requiredScenes cannot be empty');
+    }
+
+    final completed = completedClips ?? [];
+
+    final nextScene = requiredScenes.firstWhere(
+      (scene) => !_isSceneComplete(scene, completed),
+      orElse: () => throw StateError('All required scenes are already completed'),
+    );
+
+    final requiredOrientation = _determineNextRequiredOrientation(
+      scene: nextScene,
+      completedClips: completed,
+    );
+
+    return VideoCaptureFlowState(
+      requiredScenes: requiredScenes,
+      completedClips: completed,
+      stage: VideoCaptureStage.orientationMessaging,
+      currentScene: nextScene,
+      requiredOrientation: requiredOrientation,
+      isOrientationCorrect: currentOrientation == requiredOrientation,
+    );
+  }
+
+  static bool _isSceneComplete(SceneCaptureRequest scene, List<VideoClipResult> completedClips) {
+    final clipsForScene =
+        completedClips.where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType);
+    final hasPortrait = clipsForScene.any((clip) => clip.orientation == ClipOrientation.portrait);
+    final hasLandscape = clipsForScene.any((clip) => clip.orientation == ClipOrientation.landscape);
+    return hasPortrait && hasLandscape;
+  }
+
+  static Orientation _determineNextRequiredOrientation({
+    required SceneCaptureRequest scene,
+    required List<VideoClipResult> completedClips,
+  }) {
+    final orientationsCompleted = completedClips
+        .where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType)
+        .map((clip) => clip.orientation)
+        .toSet();
+
+    if (!orientationsCompleted.contains(ClipOrientation.landscape)) {
+      return Orientation.landscape;
+    }
+
+    if (!orientationsCompleted.contains(ClipOrientation.portrait)) {
+      return Orientation.portrait;
+    }
+
+    throw StateError('All orientations already completed for sceneId: ${scene.sceneId}');
+  }
 
   VideoCaptureFlowState _transitionToCompletion(VideoCaptureFlowState state) {
     return _updateVideoCaptureStage(state, VideoCaptureStage.completion).copyWith(
@@ -115,7 +183,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
 
   SceneCaptureRequest? _findNextIncompleteScene(List<VideoClipResult> completedClips) {
     return state.requiredScenes.firstWhereOrNull(
-      (scene) => !VideoCaptureFlowState.isSceneComplete(scene, completedClips),
+      (scene) => !_isSceneComplete(scene, completedClips),
     );
   }
 

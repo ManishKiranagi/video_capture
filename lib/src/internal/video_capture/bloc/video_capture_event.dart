@@ -2,6 +2,16 @@ part of 'video_capture_bloc.dart';
 
 abstract class VideoCaptureFlowEvent extends Equatable {}
 
+class VideoCaptureFlowStarted extends VideoCaptureFlowEvent {
+  final List<SceneCaptureRequest> requiredScenes;
+  final List<VideoClipResult>? completedClips;
+  final Orientation currentOrientation;
+
+  VideoCaptureFlowStarted({required this.requiredScenes, this.completedClips, required this.currentOrientation});
+  @override
+  List<Object?> get props => [requiredScenes, completedClips, currentOrientation];
+}
+
 class VideoCaptureFlowOrientationChanged extends VideoCaptureFlowEvent {
   final Orientation orientation;
 

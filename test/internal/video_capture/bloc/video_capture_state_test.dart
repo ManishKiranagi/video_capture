@@ -19,20 +19,6 @@ void main() {
       orientation: ClipOrientation.landscape,
       shotStyle: ShotStyle.walkthrough,
       sceneId: sceneId);
-  const clip1Portrait = VideoClipResult(
-    sceneId: 'scene1',
-    sceneType: SceneType.kitchen,
-    filePath: '/path/clip1.mp4',
-    orientation: ClipOrientation.portrait,
-    shotStyle: ShotStyle.cinematic,
-  );
-  const clip1Landscape = VideoClipResult(
-    sceneId: 'scene1',
-    sceneType: SceneType.kitchen,
-    filePath: '/path/clip2.mp4',
-    orientation: ClipOrientation.landscape,
-    shotStyle: ShotStyle.cinematic,
-  );
 
   group('VideoCaptureFlowState', () {
     test('constructor assigns values correctly', () {
@@ -57,20 +43,7 @@ void main() {
       expect(state.isOrientationCorrect, isTrue);
       expect(state.videoClip, sampleClip);
       expect(state.previousStage, VideoCaptureStage.shotTypeSelection);
-    });
-
-    test('initial throws ArgumentError if requiredScenes is empty', () {
-      expect(
-        () => VideoCaptureFlowState.initial(
-          requiredScenes: const [],
-          currentOrientation: Orientation.landscape,
-        ),
-        throwsA(isA<ArgumentError>().having(
-          (e) => e.message,
-          'message',
-          contains('requiredScenes cannot be empty'),
-        )),
-      );
+      expect(state.errorMessage, null);
     });
 
     test('copyWith copies and overrides fields correctly', () {
@@ -105,90 +78,6 @@ void main() {
       expect(copy.previousStage, VideoCaptureStage.orientationMessaging);
     });
 
-    test('initial factory returns proper initial state (orientation landscape)', () {
-      final requiredScenes = [
-        sampleScene,
-        bathroomScene,
-      ];
-
-      final state = VideoCaptureFlowState.initial(
-        requiredScenes: requiredScenes,
-        currentOrientation: Orientation.landscape,
-      );
-
-      expectInitialState(state, requiredScenes, true);
-    });
-
-    test('initial factory returns proper initial state (orientation portrait)', () {
-      final requiredScenes = [
-        sampleScene,
-        bathroomScene,
-      ];
-
-      final state = VideoCaptureFlowState.initial(
-        requiredScenes: requiredScenes,
-        currentOrientation: Orientation.portrait,
-      );
-
-      expectInitialState(state, requiredScenes, false);
-    });
-
-    test('initial factory throws error when requiredScenes is empty', () {
-      expect(() => VideoCaptureFlowState.initial(requiredScenes: const [], currentOrientation: Orientation.landscape),
-          throwsA(isA<ArgumentError>()));
-    });
-
-    test('initial throws StateError if all required scenes are already completed', () {
-      const scene = SceneCaptureRequest(SceneType.kitchen, 'scene1');
-      final completedClips = [
-        clip1Portrait,
-        clip1Landscape,
-      ];
-
-      expect(
-        () => VideoCaptureFlowState.initial(
-          requiredScenes: const [scene],
-          completedClips: completedClips,
-          currentOrientation: Orientation.portrait,
-        ),
-        throwsA(isA<StateError>().having(
-          (e) => e.message,
-          'message',
-          contains('All required scenes are already completed'),
-        )),
-      );
-    });
-
-    test('isSceneComplete returns true if both orientations are present', () {
-      final result = VideoCaptureFlowState.isSceneComplete(
-          const SceneCaptureRequest(SceneType.kitchen, 'scene1'), [clip1Portrait, clip1Landscape]);
-      expect(result, isTrue);
-    });
-
-    test('isSceneComplete returns false if only one orientation is present', () {
-      final result = VideoCaptureFlowState.isSceneComplete(
-          const SceneCaptureRequest(SceneType.kitchen, 'scene1'), [clip1Portrait]);
-      expect(result, isFalse);
-    });
-
-    test('determineNextRequiredOrientation returns missing orientation', () {
-      final result = VideoCaptureFlowState.determineNextRequiredOrientation(
-        scene: const SceneCaptureRequest(SceneType.kitchen, 'scene1'),
-        completedClips: [clip1Landscape],
-      );
-      expect(result, Orientation.portrait);
-    });
-
-    test('determineNextRequiredOrientation throws if all orientations are complete', () {
-      expect(
-        () => VideoCaptureFlowState.determineNextRequiredOrientation(
-          scene: const SceneCaptureRequest(SceneType.kitchen, 'scene1'),
-          completedClips: [clip1Portrait, clip1Landscape],
-        ),
-        throwsStateError,
-      );
-    });
-
     test('equality depends on props', () {
       const a = VideoCaptureFlowState(
         requiredScenes: [sampleScene],
@@ -215,17 +104,4 @@ void main() {
       expect(a == c, isFalse);
     });
   });
-}
-
-void expectInitialState(
-    VideoCaptureFlowState state, List<SceneCaptureRequest> requiredScenes, bool isOrientationCorrect) {
-  expect(state.requiredScenes, requiredScenes);
-  expect(state.completedClips, isEmpty);
-  expect(state.stage, VideoCaptureStage.orientationMessaging);
-  expect(state.currentScene, requiredScenes[0]);
-  expect(state.requiredOrientation, Orientation.landscape);
-  expect(state.isOrientationCorrect, isOrientationCorrect);
-  expect(state.selectedShotStyle, isNull);
-  expect(state.videoClip, isNull);
-  expect(state.previousStage, isNull);
 }

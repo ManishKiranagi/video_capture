@@ -15,6 +15,8 @@ class VideoCaptureFlowState extends Equatable {
 
   final bool isOrientationCorrect;
 
+  final String? errorMessage;
+
   const VideoCaptureFlowState(
       {required this.requiredScenes,
       required this.completedClips,
@@ -24,7 +26,8 @@ class VideoCaptureFlowState extends Equatable {
       this.selectedShotStyle,
       required this.isOrientationCorrect,
       this.videoClip,
-      this.previousStage});
+      this.previousStage,
+      this.errorMessage});
 
   VideoCaptureFlowState copyWith(
       {List<VideoClipResult>? completedClips,
@@ -47,63 +50,28 @@ class VideoCaptureFlowState extends Equatable {
         previousStage: previousStage ?? this.previousStage);
   }
 
-  factory VideoCaptureFlowState.initial({
-    required List<SceneCaptureRequest> requiredScenes,
-    required Orientation currentOrientation,
-    List<VideoClipResult>? completedClips,
-  }) {
-    if (requiredScenes.isEmpty) {
-      throw ArgumentError('requiredScenes cannot be empty');
-    }
-
-    final completed = completedClips ?? [];
-
-    final nextScene = requiredScenes.firstWhere(
-      (scene) => !isSceneComplete(scene, completed),
-      orElse: () => throw StateError('All required scenes are already completed'),
+  factory VideoCaptureFlowState.empty() {
+    return const VideoCaptureFlowState(
+      requiredScenes: [],
+      completedClips: [],
+      stage: VideoCaptureStage.uninitialized,
+      currentScene: null,
+      requiredOrientation: null,
+      selectedShotStyle: null,
+      isOrientationCorrect: false,
+      videoClip: null,
+      previousStage: null,
     );
+  }
 
-    final requiredOrientation = VideoCaptureFlowState.determineNextRequiredOrientation(
-      scene: nextScene,
-      completedClips: completed,
-    );
-
+  factory VideoCaptureFlowState.failure(String message) {
     return VideoCaptureFlowState(
-      requiredScenes: requiredScenes,
-      completedClips: completed,
-      stage: VideoCaptureStage.orientationMessaging,
-      currentScene: nextScene,
-      requiredOrientation: requiredOrientation,
-      isOrientationCorrect: currentOrientation == requiredOrientation,
+      requiredScenes: const [],
+      completedClips: const [],
+      stage: VideoCaptureStage.error,
+      isOrientationCorrect: false,
+      errorMessage: message,
     );
-  }
-
-  static bool isSceneComplete(SceneCaptureRequest scene, List<VideoClipResult> completedClips) {
-    final clipsForScene =
-        completedClips.where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType);
-    final hasPortrait = clipsForScene.any((clip) => clip.orientation == ClipOrientation.portrait);
-    final hasLandscape = clipsForScene.any((clip) => clip.orientation == ClipOrientation.landscape);
-    return hasPortrait && hasLandscape;
-  }
-
-  static Orientation determineNextRequiredOrientation({
-    required SceneCaptureRequest scene,
-    required List<VideoClipResult> completedClips,
-  }) {
-    final orientationsCompleted = completedClips
-        .where((clip) => clip.sceneId == scene.sceneId && clip.sceneType == scene.sceneType)
-        .map((clip) => clip.orientation)
-        .toSet();
-
-    if (!orientationsCompleted.contains(ClipOrientation.landscape)) {
-      return Orientation.landscape;
-    }
-
-    if (!orientationsCompleted.contains(ClipOrientation.portrait)) {
-      return Orientation.portrait;
-    }
-
-    throw StateError('All orientations already completed for sceneId: ${scene.sceneId}');
   }
 
   @override
@@ -114,6 +82,9 @@ class VideoCaptureFlowState extends Equatable {
         currentScene,
         requiredOrientation,
         selectedShotStyle,
-        isOrientationCorrect
+        isOrientationCorrect,
+        videoClip,
+        previousStage,
+        errorMessage
       ];
 }
