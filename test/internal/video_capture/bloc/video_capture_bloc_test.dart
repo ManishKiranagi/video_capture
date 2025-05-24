@@ -471,7 +471,7 @@ void main() {
       );
     });
 
-    group('filming process started', () {
+    group('filming process started tests', () {
       blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
         'when videoCaptureGuidance stage emits stage as shotTypeSelection and previousStage as  shotTypeSelection',
         build: () => VideoCaptureFlowBloc(),
@@ -516,6 +516,24 @@ void main() {
         ),
         expect: () =>
             [isA<VideoCaptureFlowState>().having((s) => s.selectedShotStyle, 'selectedShotStyle', ShotStyle.cinematic)],
+      );
+    });
+
+    group('filming started tests', () {
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits stage as recording',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+          stage: VideoCaptureStage.shotTypeSelection,
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowFilmingStarted(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.recording)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.shotTypeSelection),
+        ],
       );
     });
     // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
