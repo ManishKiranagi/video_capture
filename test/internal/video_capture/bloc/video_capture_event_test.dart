@@ -42,9 +42,8 @@ void main() {
 
   group('VideoCaptureFlowShotApproved', () {
     test('props contains videoFilePath', () {
-      const path = '/tmp/approved.mp4';
-      final event = VideoCaptureFlowShotApproved(videoFilePath: path);
-      expect(event.props, [path]);
+      final event = VideoCaptureFlowShotApproved();
+      expect(event.props, []);
     });
   });
 }

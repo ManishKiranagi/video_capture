@@ -53,9 +53,8 @@ class VideoCaptureFlowFilmingFinished extends VideoCaptureFlowEvent {
 }
 
 class VideoCaptureFlowShotApproved extends VideoCaptureFlowEvent {
-  final String videoFilePath;
-  VideoCaptureFlowShotApproved({required this.videoFilePath});
+  VideoCaptureFlowShotApproved();
 
   @override
-  List<Object> get props => [videoFilePath];
+  List<Object> get props => [];
 }

@@ -30,7 +30,8 @@ class VideoCaptureFlowState extends Equatable {
       this.errorMessage});
 
   VideoCaptureFlowState copyWith(
-      {List<VideoClipResult>? completedClips,
+      {List<SceneCaptureRequest>? requiredScenes,
+      List<VideoClipResult>? completedClips,
       VideoCaptureStage? stage,
       Wrapped<SceneCaptureRequest?>? currentScene,
       Wrapped<Orientation?>? requiredOrientation,
@@ -39,7 +40,7 @@ class VideoCaptureFlowState extends Equatable {
       Wrapped<VideoClipResult?>? videoClip,
       VideoCaptureStage? previousStage}) {
     return VideoCaptureFlowState(
-        requiredScenes: requiredScenes,
+        requiredScenes: requiredScenes ?? this.requiredScenes,
         completedClips: completedClips ?? this.completedClips,
         stage: stage ?? this.stage,
         currentScene: currentScene != null ? currentScene.value : this.currentScene,

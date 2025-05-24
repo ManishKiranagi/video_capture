@@ -172,7 +172,7 @@ class VideoCaptureFlowBloc extends Bloc<VideoCaptureFlowEvent, VideoCaptureFlowS
     final requiredOrientation = _toggleOrientation(state.requiredOrientation!);
 
     final selectedShotStyle =
-        state.requiredOrientation == Orientation.landscape ? const Wrapped<ShotStyle?>.value(null) : null;
+        requiredOrientation == Orientation.landscape ? const Wrapped<ShotStyle?>.value(null) : null;
 
     return _updateVideoCaptureStage(state, VideoCaptureStage.orientationMessaging).copyWith(
       currentScene: Wrapped.value(nextScene),

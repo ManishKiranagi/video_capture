@@ -4,9 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:video_capture/src/helpers/wrapper.dart';
 import 'package:video_capture/src/internal/video_capture/bloc/video_capture_bloc.dart';
 import 'package:video_capture/src/internal/video_capture/model/video_capture_stage.dart';
-import 'package:video_capture/src/public/model/scene_capture_request.dart';
-import 'package:video_capture/src/public/model/scene_type.dart';
-import 'package:video_capture/src/public/model/video_clip_result.dart';
 import 'package:video_capture/video_capture_package.dart';
 
 void main() {
@@ -565,89 +562,85 @@ void main() {
         ],
       );
     });
-    // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-    //   'emits state with selected shot style',
-    //   build: () => VideoCaptureFlowBloc(
-    //     requiredScenes: requiredScenes,
-    //     currentOrientation: Orientation.landscape,
-    //   ),
-    //   act: (bloc) => bloc.add(
-    //     const VideoCaptureFlowShotStyleSelected(ShotStyle.closeUp),
-    //   ),
-    //   expect: () => [
-    //     isA<VideoCaptureFlowState>().having((s) => s.selectedShotStyle, 'shotStyle', ShotStyle.closeUp),
-    //   ],
-    // );
 
-    // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-    //   'goes to approval after filming finished',
-    //   build: () => VideoCaptureFlowBloc(
-    //     requiredScenes: requiredScenes,
-    //     currentOrientation: Orientation.landscape,
-    //   ),
-    //   seed: () => VideoCaptureFlowState.initial(
-    //     requiredScenes: requiredScenes,
-    //     currentOrientation: Orientation.landscape,
-    //   ).copyWith(
-    //     stage: VideoCaptureStage.recording,
-    //     selectedShotStyle: const Wrapped.value(ShotStyle.fullRoom),
-    //   ),
-    //   act: (bloc) => bloc.add(
-    //     const VideoCaptureFlowFilmingFinished('test/path.mp4'),
-    //   ),
-    //   expect: () => [
-    //     isA<VideoCaptureFlowState>()
-    //         .having((s) => s.stage, 'stage', VideoCaptureStage.approval)
-    //         .having((s) => s.videoClip?.filePath, 'videoClip.path', 'test/path.mp4'),
-    //   ],
-    // );
+    group('video capture approval tests', () {
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits correct state with stage as completion when all scenes are completed',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+          stage: VideoCaptureStage.approval,
+          requiredScenes: requiredScenes,
+          currentScene: Wrapped.value(scene2),
+          completedClips: [scene1landscape, scene1portrait, scene2landscape],
+          videoClip: Wrapped.value(scene2portrait),
+          requiredOrientation: const Wrapped.value(Orientation.landscape),
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowShotApproved(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.completion)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.approval)
+              .having((s) => s.videoClip, 'videoClip', null)
+              .having((s) => s.currentScene, 'currentScene', null)
+              .having((s) => s.requiredOrientation, 'requiredOrientation', null)
+              .having((s) => s.selectedShotStyle, 'selectedShotStyle', null)
+              .having((s) => s.completedClips.last, 'completedClips', scene2portrait)
+        ],
+      );
 
-    // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-    //   'completes flow when all scenes and orientations are captured',
-    //   build: () => VideoCaptureFlowBloc(
-    //     requiredScenes: [
-    //       SceneCaptureRequest(sceneId: 'scene1', sceneType: SceneType.bathroom),
-    //     ],
-    //     completedClips: [
-    //       VideoClipResult(
-    //         sceneId: 'scene1',
-    //         sceneType: SceneType.bathroom,
-    //         filePath: 'a.mp4',
-    //         orientation: ClipOrientation.landscape,
-    //         shotStyle: ShotStyle.fullRoom,
-    //       ),
-    //     ],
-    //     currentOrientation: Orientation.portrait,
-    //   ),
-    //   seed: () => VideoCaptureFlowState.initial(
-    //     requiredScenes: [
-    //       SceneCaptureRequest(sceneId: 'scene1', sceneType: SceneType.bathroom),
-    //     ],
-    //     completedClips: [
-    //       VideoClipResult(
-    //         sceneId: 'scene1',
-    //         sceneType: SceneType.bathroom,
-    //         filePath: 'a.mp4',
-    //         orientation: ClipOrientation.landscape,
-    //         shotStyle: ShotStyle.fullRoom,
-    //       ),
-    //     ],
-    //     currentOrientation: Orientation.portrait,
-    //   ).copyWith(
-    //     stage: VideoCaptureStage.approval,
-    //     selectedShotStyle: const Wrapped.value(ShotStyle.closeUp),
-    //     videoClip: Wrapped.value(VideoClipResult(
-    //       sceneId: 'scene1',
-    //       sceneType: SceneType.bathroom,
-    //       filePath: 'b.mp4',
-    //       orientation: ClipOrientation.portrait,
-    //       shotStyle: ShotStyle.closeUp,
-    //     )),
-    //   ),
-    //   act: (bloc) => bloc.add(const VideoCaptureFlowShotApproved()),
-    //   expect: () => [
-    //     isA<VideoCaptureFlowState>().having((s) => s.stage, 'stage', VideoCaptureStage.completion),
-    //   ],
-    // );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits correct state with stage as orientationMessaging when all clips in a scene are completed and there are more scenes to capture',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredScenes: requiredScenes,
+            currentScene: Wrapped.value(scene1),
+            completedClips: [scene1landscape],
+            videoClip: Wrapped.value(scene1portrait),
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            selectedShotStyle: const Wrapped.value(ShotStyle.walkthrough)),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowShotApproved(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.orientationMessaging)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.approval)
+              .having((s) => s.videoClip, 'videoClip', null)
+              .having((s) => s.currentScene, 'currentScene', scene2)
+              .having((s) => s.requiredOrientation, 'requiredOrientation', Orientation.landscape)
+              .having((s) => s.selectedShotStyle, 'selectedShotStyle', null)
+              .having((s) => s.completedClips.last, 'completedClips', scene1portrait)
+        ],
+      );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits correct state with stage as orientationMessaging when all clips in a scene are not completed',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredScenes: requiredScenes,
+            currentScene: Wrapped.value(scene2),
+            completedClips: [scene1landscape, scene1portrait],
+            videoClip: Wrapped.value(scene2landscape),
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            selectedShotStyle: const Wrapped.value(ShotStyle.walkthrough)),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowShotApproved(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.orientationMessaging)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.approval)
+              .having((s) => s.videoClip, 'videoClip', null)
+              .having((s) => s.currentScene, 'currentScene', scene2)
+              .having((s) => s.requiredOrientation, 'requiredOrientation', Orientation.portrait)
+              .having((s) => s.selectedShotStyle, 'selectedShotStyle', ShotStyle.walkthrough)
+              .having((s) => s.completedClips.last, 'completedClips', scene2landscape)
+        ],
+      );
+    });
   });
 }
