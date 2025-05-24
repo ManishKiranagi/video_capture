@@ -54,10 +54,6 @@ void main() {
         final bloc = VideoCaptureFlowBloc();
 
         expect(bloc.state, VideoCaptureFlowState.empty());
-
-        // expect(bloc.state.requiredScenes, requiredScenes);
-        // expect(bloc.state.completedClips, isEmpty);
-        // expect(bloc.state.isOrientationCorrect, true);
       });
     });
 
