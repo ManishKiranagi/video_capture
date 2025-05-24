@@ -262,215 +262,262 @@ void main() {
               .having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
         ],
       );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when recording stage and requiredOrientation is landscape and orientation set to landscape emits [shotTypeSelection]',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+          stage: VideoCaptureStage.recording,
+          requiredOrientation: const Wrapped.value(Orientation.landscape),
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.recording)
+              .having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when recording stage and requiredOrientation is portrait and orientation set to portrait emits [shotTypeSelection]',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+          stage: VideoCaptureStage.recording,
+          requiredOrientation: const Wrapped.value(Orientation.portrait),
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.recording)
+              .having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when videoCaptureGuidance stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.videoCaptureGuidance,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when videoCaptureGuidance stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.videoCaptureGuidance,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when videoCaptureGuidance stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.videoCaptureGuidance,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when videoCaptureGuidance stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.videoCaptureGuidance,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when shotTypeSelection stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.shotTypeSelection,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when shotTypeSelection stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.shotTypeSelection,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when shotTypeSelection stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.shotTypeSelection,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when shotTypeSelection stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.shotTypeSelection,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
+
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when approval stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when approval stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredOrientation: const Wrapped.value(Orientation.portrait),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when approval stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: false),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
+        ],
+      );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when approval stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.approval,
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            isOrientationCorrect: true),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
+        ],
+      );
     });
 
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when recording stage and requiredOrientation is landscape and orientation set to landscape emits [shotTypeSelection]',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-        stage: VideoCaptureStage.recording,
-        requiredOrientation: const Wrapped.value(Orientation.landscape),
-      ),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>()
-            .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
-            .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.recording)
-            .having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when recording stage and requiredOrientation is portrait and orientation set to portrait emits [shotTypeSelection]',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-        stage: VideoCaptureStage.recording,
-        requiredOrientation: const Wrapped.value(Orientation.portrait),
-      ),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>()
-            .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
-            .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.recording)
-            .having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when videoCaptureGuidance stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
+    group('filming process started', () {
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when videoCaptureGuidance stage emits stage as shotTypeSelection and previousStage as  shotTypeSelection',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
           stage: VideoCaptureStage.videoCaptureGuidance,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when videoCaptureGuidance stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.videoCaptureGuidance,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when videoCaptureGuidance stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.videoCaptureGuidance,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when videoCaptureGuidance stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.videoCaptureGuidance,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowFilmingProcessStarted(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.videoCaptureGuidance),
+        ],
+      );
 
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when shotTypeSelection stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.shotTypeSelection,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when shotTypeSelection stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.shotTypeSelection,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when shotTypeSelection stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.shotTypeSelection,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when shotTypeSelection stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.shotTypeSelection,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'when approval stage emits stage as shotTypeSelection and previousStage as  approval',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+          stage: VideoCaptureStage.approval,
+        ),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowFilmingProcessStarted(),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.shotTypeSelection)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.approval),
+        ],
+      );
+    });
 
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when approval stage and requiredOrientation is portrait and orientation set to landscape emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.approval,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when approval stage and requiredOrientation is portrait and orientation set to portrait emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.approval,
-          requiredOrientation: const Wrapped.value(Orientation.portrait),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when approval stage and requiredOrientation is landscape and orientation set to landscape emits isOrientationCorrect as true',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.approval,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: false),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.landscape),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', true),
-      ],
-    );
-    blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
-      'when approval stage and requiredOrientation is landscape and orientation set to portrait emits isOrientationCorrect as false',
-      build: () => VideoCaptureFlowBloc(),
-      seed: () => VideoCaptureFlowState.empty().copyWith(
-          stage: VideoCaptureStage.approval,
-          requiredOrientation: const Wrapped.value(Orientation.landscape),
-          isOrientationCorrect: true),
-      act: (bloc) => bloc.add(
-        VideoCaptureFlowOrientationChanged(orientation: Orientation.portrait),
-      ),
-      expect: () => [
-        isA<VideoCaptureFlowState>().having((s) => s.isOrientationCorrect, 'isOrientationCorrect', false),
-      ],
-    );
-
+    group('shot style selected tests', () {
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits state with selected shotstyle',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.shotTypeSelection, selectedShotStyle: const Wrapped.value(ShotStyle.walkthrough)),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowShotStyleSelected(shotStyle: ShotStyle.cinematic),
+        ),
+        expect: () =>
+            [isA<VideoCaptureFlowState>().having((s) => s.selectedShotStyle, 'selectedShotStyle', ShotStyle.cinematic)],
+      );
+    });
     // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
     //   'emits state with selected shot style',
     //   build: () => VideoCaptureFlowBloc(
