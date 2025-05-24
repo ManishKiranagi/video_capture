@@ -536,6 +536,35 @@ void main() {
         ],
       );
     });
+
+    group('filming finished tests', () {
+      blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
+        'emits state with stage as approval and correct video clip based on generated filepath, scene and orientation',
+        build: () => VideoCaptureFlowBloc(),
+        seed: () => VideoCaptureFlowState.empty().copyWith(
+            stage: VideoCaptureStage.recording,
+            currentScene: Wrapped.value(scene1),
+            requiredOrientation: const Wrapped.value(Orientation.landscape),
+            selectedShotStyle: const Wrapped.value(ShotStyle.walkthrough)),
+        act: (bloc) => bloc.add(
+          VideoCaptureFlowFilmingFinished('/scene1.mp4'),
+        ),
+        expect: () => [
+          isA<VideoCaptureFlowState>()
+              .having((s) => s.stage, 'stage', VideoCaptureStage.approval)
+              .having((s) => s.previousStage, 'previousStage', VideoCaptureStage.recording)
+              .having(
+                  (s) => s.videoClip,
+                  'videoClip',
+                  VideoClipResult(
+                      sceneId: scene1.sceneId,
+                      sceneType: scene1.sceneType,
+                      filePath: '/scene1.mp4',
+                      orientation: ClipOrientation.landscape,
+                      shotStyle: ShotStyle.walkthrough)),
+        ],
+      );
+    });
     // blocTest<VideoCaptureFlowBloc, VideoCaptureFlowState>(
     //   'emits state with selected shot style',
     //   build: () => VideoCaptureFlowBloc(
