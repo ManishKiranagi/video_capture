@@ -31,7 +31,7 @@ class _VideoCaptureMainWidgetState extends State<VideoCaptureMainWidget> {
     if (widget.selectedSceneTypes != null) {
       return VideoCaptureFlowWidget(
         config: config,
-        selectedSceneTypes: widget.selectedSceneTypes,
+        selectedSceneTypes: widget.selectedSceneTypes!,
         completedClips: widget.completedClips,
       );
     }
@@ -39,7 +39,7 @@ class _VideoCaptureMainWidgetState extends State<VideoCaptureMainWidget> {
     if (_selectedScenes != null) {
       return VideoCaptureFlowWidget(
         config: config,
-        selectedSceneTypes: _selectedScenes,
+        selectedSceneTypes: _selectedScenes!,
       );
     }
 
