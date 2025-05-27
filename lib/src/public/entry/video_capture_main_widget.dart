@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_capture/src/internal/scene_type_selection/ui/scene_type_selection_screen.dart';
+import 'package:video_capture/src/internal/theme.dart';
 import 'package:video_capture/src/internal/video_capture/ui/video_capture_flow_widget.dart';
 import 'package:video_capture/src/public/model/scene_capture_request.dart';
 import 'package:video_capture/src/public/model/video_capture_config.dart';
@@ -28,24 +29,32 @@ class _VideoCaptureMainWidgetState extends State<VideoCaptureMainWidget> {
   @override
   Widget build(BuildContext context) {
     final config = widget.config;
-    if (widget.selectedSceneTypes != null) {
-      return VideoCaptureFlowWidget(
-        config: config,
-        selectedSceneTypes: widget.selectedSceneTypes!,
-        completedClips: widget.completedClips,
-      );
-    }
+    final theme = config.theme ?? videoCaptureDefaultTheme;
 
-    if (_selectedScenes != null) {
-      return VideoCaptureFlowWidget(
-        config: config,
-        selectedSceneTypes: _selectedScenes!,
-      );
-    }
+    return Theme(
+        data: theme,
+        child: Builder(
+          builder: (context) {
+            if (widget.selectedSceneTypes != null) {
+              return VideoCaptureFlowWidget(
+                config: config,
+                selectedSceneTypes: widget.selectedSceneTypes!,
+                completedClips: widget.completedClips,
+              );
+            }
 
-    return SceneTypeSelectionScreen(
-      onSceneTypesConfirmed: _handleSceneTypesSelected,
-      videoCaptureConfig: config,
-    );
+            if (_selectedScenes != null) {
+              return VideoCaptureFlowWidget(
+                config: config,
+                selectedSceneTypes: _selectedScenes!,
+              );
+            }
+
+            return SceneTypeSelectionScreen(
+              onSceneTypesConfirmed: _handleSceneTypesSelected,
+              videoCaptureConfig: config,
+            );
+          },
+        ));
   }
 }
